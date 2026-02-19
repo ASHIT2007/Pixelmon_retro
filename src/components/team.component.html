@@ -1,0 +1,42 @@
+<div class="w-full h-full bg-[#305048] flex flex-col p-4 text-white">
+  
+  <div class="flex justify-between items-center mb-4 border-b-2 border-white pb-2">
+    <h1 class="text-xl">POKEMON MENU</h1>
+    <button (click)="close()" class="bg-white text-black px-3 py-1 rounded shadow hover:bg-gray-200">EXIT</button>
+  </div>
+
+  <div class="flex-1 overflow-y-auto space-y-2 pr-2">
+    @for (pkmn of game.playerTeam(); track pkmn.uid) {
+      <div class="bg-[#183028] border-2 border-[#50a088] rounded-lg p-2 flex items-center gap-4 shadow-lg">
+        
+        <!-- Icon -->
+        <div class="w-12 h-12 bg-white/10 rounded flex items-center justify-center overflow-hidden">
+          <img [src]="getSprite(pkmn.baseId)" alt="sprite" class="w-16 h-16 object-cover object-top">
+        </div>
+
+        <!-- Details -->
+        <div class="flex-1">
+          <div class="flex justify-between items-end mb-1">
+            <span class="uppercase font-bold">{{ pkmn.name }}</span>
+            <span class="text-[10px] text-gray-300">Lv{{ pkmn.level }}</span>
+          </div>
+          
+          <!-- HP Bar -->
+          <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden mb-1">
+            <div class="h-full bg-green-500" [style.width.%]="(pkmn.currentHp / pkmn.maxHp) * 100"></div>
+          </div>
+          
+          <div class="text-right text-[10px] text-gray-300">
+            HP: {{ pkmn.currentHp }}/{{ pkmn.maxHp }}
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+
+  <div class="mt-4 text-[10px] text-center text-gray-400">
+    Select a Pokemon to view stats (Not implemented in demo)
+  </div>
+
+</div>

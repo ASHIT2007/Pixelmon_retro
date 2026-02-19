@@ -1,0 +1,16 @@
+<div class="w-full h-full relative">
+  @switch (game.view()) {
+    @case ('starter-select') {
+      <app-starter-select></app-starter-select>
+    }
+    @case ('overworld') {
+      <app-overworld></app-overworld>
+    }
+    @case ('battle') {
+      <app-battle></app-battle>
+    }
+    @case ('team') {
+      <app-team></app-team>
+    }
+  }
+</div>

@@ -1,0 +1,149 @@
+<div class="w-full h-full flex flex-col bg-white overflow-hidden relative" style="image-rendering: pixelated;">
+  
+  <!-- Battle Scene -->
+  <div class="flex-1 relative bg-gradient-to-b from-[#e0f8d0] to-[#88c070] border-b-4 border-[#1a202c] overflow-hidden">
+    
+    <!-- Attack Animations Overlay -->
+    @if (activeEffect(); as effect) {
+      <div class="absolute inset-0 z-50 pointer-events-none flex items-center justify-center">
+        <!-- Projectile shape based on attack type -->
+        <div class="w-10 h-10 rounded-full border-4 shadow-2xl"
+             [class.anim-shoot-up]="effect.isPlayer"
+             [class.anim-shoot-down]="!effect.isPlayer"
+             [class.bg-red-500]="effect.type === 'Fire'"
+             [class.border-red-300]="effect.type === 'Fire'"
+             [class.bg-blue-500]="effect.type === 'Water'"
+             [class.border-blue-300]="effect.type === 'Water'"
+             [class.bg-green-500]="effect.type === 'Grass'"
+             [class.border-green-300]="effect.type === 'Grass'"
+             [class.bg-white]="effect.type === 'Normal'"
+             [class.border-gray-300]="effect.type === 'Normal'">
+        </div>
+      </div>
+    }
+
+    <!-- Enemy Status Box (Top Left) -->
+    <div class="absolute top-4 left-4 z-20 w-48 battle-menu-box p-2 rounded-tl-xl rounded-br-xl shadow-md">
+      <div class="flex justify-between items-end mb-1">
+        <span class="uppercase font-bold tracking-tighter">{{ enemyPkmn()?.name }}</span>
+        <span class="text-[10px]">Lv{{ enemyPkmn()?.level }}</span>
+      </div>
+      <!-- HP Bar -->
+      <div class="w-full bg-gray-300 h-3 rounded-full border border-gray-600 overflow-hidden flex">
+        <div class="bg-gray-800 text-[8px] text-white px-1 leading-3 font-sans font-bold flex-shrink-0 z-10">HP</div>
+        <div class="h-full bg-green-500 transition-all duration-300" 
+             [style.width.%]="enemyHpPercent()"
+             [class.bg-yellow-400]="enemyHpPercent() < 50"
+             [class.bg-red-500]="enemyHpPercent() < 20"></div>
+      </div>
+    </div>
+
+    <!-- Enemy Sprite (Top Right) -->
+    <div class="absolute top-12 right-8 w-32 h-32 z-10 flex items-end justify-center"
+         [class.animate-blink]="isAnimatingEnemy()">
+      <!-- Shadow -->
+      <div class="absolute bottom-0 w-24 h-6 bg-black/20 rounded-[50%]"></div>
+      @if (enemyBase()) {
+        <img [src]="enemyBase()!.frontSprite" alt="Enemy" class="w-full h-full object-contain drop-shadow-md relative z-10 transform scale-150 origin-bottom">
+      }
+    </div>
+
+
+    <!-- Player Sprite (Bottom Left) -->
+    <div class="absolute bottom-4 left-4 w-32 h-32 z-10 flex items-end justify-center"
+         [class.animate-shake]="isAnimatingPlayer()">
+      <div class="absolute bottom-0 w-24 h-6 bg-black/20 rounded-[50%]"></div>
+      @if (playerBase()) {
+        <img [src]="playerBase()!.backSprite" alt="Player" class="w-full h-full object-contain relative z-10 transform scale-[1.7] origin-bottom">
+      }
+    </div>
+
+    <!-- Player Status Box (Bottom Right) -->
+    <div class="absolute bottom-8 right-4 z-20 w-52 battle-menu-box p-2 rounded-tl-xl rounded-br-xl shadow-md">
+      <div class="flex justify-between items-end mb-1">
+        <span class="uppercase font-bold tracking-tighter">{{ playerPkmn()?.name }}</span>
+        <span class="text-[10px]">Lv{{ playerPkmn()?.level }}</span>
+      </div>
+      <!-- HP Bar -->
+      <div class="w-full bg-gray-300 h-3 rounded-full border border-gray-600 overflow-hidden flex mb-1">
+        <div class="bg-gray-800 text-[8px] text-white px-1 leading-3 font-sans font-bold flex-shrink-0 z-10">HP</div>
+        <div class="h-full bg-green-500 transition-all duration-300"
+             [style.width.%]="playerHpPercent()"
+             [class.bg-yellow-400]="playerHpPercent() < 50"
+             [class.bg-red-500]="playerHpPercent() < 20"></div>
+      </div>
+      <div class="text-right text-[10px] pr-1">
+        {{ playerPkmn()?.currentHp }} / {{ playerPkmn()?.maxHp }}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Dialog / Menu Area -->
+  <div class="h-32 bg-white relative">
+    
+    <!-- Message View -->
+    @if (menuState() === 'message') {
+      <div class="absolute inset-0 battle-menu-box m-1 p-4 flex items-center">
+        <p class="leading-relaxed">{{ battleMessage() }}</p>
+      </div>
+    }
+
+    <!-- Main Menu -->
+    @if (menuState() === 'main') {
+      <div class="absolute inset-0 flex">
+        <!-- Persistent Text Box -->
+        <div class="flex-1 battle-menu-box m-1 mr-0 p-4 flex items-center">
+          <p>What will<br>{{ playerPkmn()?.name }} do?</p>
+        </div>
+        <!-- Action Grid -->
+        <div class="w-48 battle-menu-box m-1 p-2 grid grid-cols-2 gap-2 text-sm">
+          <button (click)="setMenu('fight')" class="text-left hover:text-gray-500 hover:pl-2 transition-all before:content-['▶'] before:opacity-0 hover:before:opacity-100 before:mr-1">FIGHT</button>
+          <button (click)="setMenu('bag')" class="text-left hover:text-gray-500 hover:pl-2 transition-all before:content-['▶'] before:opacity-0 hover:before:opacity-100 before:mr-1">BAG</button>
+          <button class="text-left text-gray-400 line-through">PKMN</button> <!-- Disabled for simplicity -->
+          <button (click)="tryRun()" class="text-left hover:text-gray-500 hover:pl-2 transition-all before:content-['▶'] before:opacity-0 hover:before:opacity-100 before:mr-1">RUN</button>
+        </div>
+      </div>
+    }
+
+    <!-- Fight Menu -->
+    @if (menuState() === 'fight') {
+      <div class="absolute inset-0 flex">
+        <div class="flex-1 battle-menu-box m-1 grid grid-cols-2 gap-2 p-3">
+          @for (move of playerPkmn()?.moves; track move.id) {
+            <button (click)="useMove(move)" 
+                    class="text-left uppercase text-xs sm:text-sm hover:bg-gray-100 p-1 rounded transition-colors flex flex-col justify-center">
+              <span>{{ move.name }}</span>
+              <span class="text-[8px] text-gray-500 mt-1">TYPE/{{ move.type }}</span>
+            </button>
+          }
+        </div>
+        <!-- Back Button Area -->
+        <div class="w-16 flex flex-col justify-center p-2">
+           <button (click)="setMenu('main')" class="battle-menu-box p-2 text-xs text-center active:bg-gray-200">BACK</button>
+        </div>
+      </div>
+    }
+
+    <!-- Bag Menu -->
+    @if (menuState() === 'bag') {
+      <div class="absolute inset-0 battle-menu-box m-1 p-3 flex flex-col">
+        <div class="flex justify-between items-center border-b border-dashed border-gray-400 pb-2 mb-2">
+          <span>Items</span>
+          <button (click)="setMenu('main')" class="text-xs border px-2 py-1 rounded hover:bg-gray-100">Cancel</button>
+        </div>
+        
+        <button (click)="tryCatch()" class="flex justify-between items-center p-2 hover:bg-gray-100 rounded text-left">
+          <span>POKE BALL</span>
+          <span>x{{ game.inventory().pokeballs }}</span>
+        </button>
+        
+        <div class="flex justify-between items-center p-2 text-gray-400 text-left">
+          <span>POTION (disabled)</span>
+          <span>x{{ game.inventory().potions }}</span>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
