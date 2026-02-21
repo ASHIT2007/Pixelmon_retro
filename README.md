@@ -3,8 +3,7 @@
 A faithful, browser-based recreation of the classic **Pokémon Red/Blue** experience — built from scratch with modern web tech.  
 Explore Kanto, catch 'em all (151 Pokémon), battle trainers, collect badges, and become Champion... all in your browser!
 
-![Gameplay Screenshot](https://via.placeholder.com/800x450/0f3f0f/ffffff?text=PixelMon+Retro+Gameplay)  
-*(Replace with your actual screenshots after playing)*
+PLAY LIVE ON : https://pixelmon-retro-al1o.vercel.app/
 
 ## ✨ Features
 
